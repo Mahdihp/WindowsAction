@@ -13,6 +13,8 @@ namespace WinAction
         public static extern void LockWorkStation();
 
         public RegistryKey rk;
+
+        public string HourCompare { get; set; }
         public Form1()
         {
             InitializeComponent();
@@ -31,17 +33,18 @@ namespace WinAction
         {
             try
             {
-                string action = WindowsAction.Properties.Settings.Default.Action;
                 if (string.IsNullOrEmpty(WindowsAction.Properties.Settings.Default.DateTime))
                 {
                     dateTimePicker1.Value = DateTime.Now;
+                    HourCompare = dateTimePicker1.Value.ToString("HH:mm:ss");
                 }
                 else
                 {
                     var dateTime = WindowsAction.Properties.Settings.Default.DateTime;
                     dateTimePicker1.Value = DateTime.Parse(dateTime);
+                    HourCompare = dateTimePicker1.Value.ToString("HH:mm:ss");
                 }
-
+                string action = WindowsAction.Properties.Settings.Default.Action;
                 switch (action)
                 {
                     case "radioButton1":
@@ -67,6 +70,21 @@ namespace WinAction
                 {
                     checkBox1.CheckState = CheckState.Unchecked;
                 }
+
+                var AfterStart = WindowsAction.Properties.Settings.Default.AfterStart;
+                if (AfterStart)
+                {
+                    checkBox2.CheckState = CheckState.Checked;
+                    var AfterStartHour = WindowsAction.Properties.Settings.Default.AfterStartHour;
+                    var date = DateTime.Now.AddHours(double.Parse(AfterStartHour.ToString()));
+                    HourCompare = date.ToString("HH:mm:ss");
+                }
+                else
+                {
+                    checkBox2.CheckState = CheckState.Unchecked;
+                    HourCompare = dateTimePicker1.Value.ToString("HH:mm:ss");
+                }
+
             }
             catch (Exception ex)
             {
@@ -98,7 +116,7 @@ namespace WinAction
 
         private void BtnSetting_Click(object sender, EventArgs e)
         {
-            WindowsAction.Properties.Settings.Default.DateTime = dateTimePicker1.Value.ToString();
+            WindowsAction.Properties.Settings.Default.DateTime = dateTimePicker1.Value.ToString("HH:mm:ss");
             if (radioButton1.Checked == true)
             {
                 WindowsAction.Properties.Settings.Default.Action = "radioButton1";
@@ -116,6 +134,8 @@ namespace WinAction
                 WindowsAction.Properties.Settings.Default.Action = "radioButton4";
             }
 
+
+
             WindowsAction.Properties.Settings.Default.Save();
             timer1.Enabled = true;
             timer1.Start();
@@ -124,10 +144,8 @@ namespace WinAction
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            string setTime = dateTimePicker1.Value.ToString("HH:mm:ss");
             string nowTime = DateTime.Now.ToString("HH:mm:ss");
-            //if (DateTime.Now >= dateTimePicker1.Value)
-            if (setTime == nowTime)
+            if (HourCompare == nowTime)
             {
                 timer1.Stop();
                 timer1.Enabled = false;
@@ -171,6 +189,7 @@ namespace WinAction
 
         private void BtnStop_Click(object sender, EventArgs e)
         {
+            timer1.Enabled = false;
             timer1.Stop();
         }
 
@@ -187,6 +206,44 @@ namespace WinAction
                 rk.DeleteValue(nameof(WindowsAction), false);
 
             WindowsAction.Properties.Settings.Default.StartUp = checkBox1.Checked;
+            WindowsAction.Properties.Settings.Default.Save();
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox2.Checked)
+            {
+                numericUpDown1.Enabled = true;
+                dateTimePicker1.Enabled = false;
+
+                var date = DateTime.Now.AddHours(double.Parse(numericUpDown1.Value.ToString()));
+                HourCompare = date.ToString("HH:mm:ss");
+
+            }
+            else
+            {
+                HourCompare = dateTimePicker1.Value.ToString("HH:mm:ss");
+                numericUpDown1.Enabled = false;
+                dateTimePicker1.Enabled = true;
+
+            }
+           
+            WindowsAction.Properties.Settings.Default.AfterStart = checkBox2.Checked;
+            WindowsAction.Properties.Settings.Default.Save();
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            var date = DateTime.Now.AddHours(double.Parse(numericUpDown1.Value.ToString()));
+            HourCompare = date.ToString("HH:mm:ss");
+            WindowsAction.Properties.Settings.Default.AfterStartHour = (int)numericUpDown1.Value;
+            WindowsAction.Properties.Settings.Default.Save();
+        }
+
+        private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
+        {
+            HourCompare = dateTimePicker1.Value.ToString("HH:mm:ss");
+            WindowsAction.Properties.Settings.Default.DateTime = HourCompare;
             WindowsAction.Properties.Settings.Default.Save();
         }
     }

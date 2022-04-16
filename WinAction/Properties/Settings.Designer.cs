@@ -58,5 +58,29 @@ namespace WindowsAction.Properties {
                 this["StartUp"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AfterStart {
+            get {
+                return ((bool)(this["AfterStart"]));
+            }
+            set {
+                this["AfterStart"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int AfterStartHour {
+            get {
+                return ((int)(this["AfterStartHour"]));
+            }
+            set {
+                this["AfterStartHour"] = value;
+            }
+        }
     }
 }
