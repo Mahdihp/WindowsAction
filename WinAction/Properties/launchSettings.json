@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "WindowsAction": {
+      "commandName": "Project"
+    }
+  }
+}
